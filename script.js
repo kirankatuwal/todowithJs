@@ -1,5 +1,15 @@
 const addBtn = document.querySelector('#add');
+const updateLocalStograge = () => {
 
+    const textAreaData = document.querySelectorAll('textarea');
+    const notes = [];
+    textAreaData.forEach((note) => {
+        return notes.push(note.value);
+    });
+    console.log(notes);
+    // adding to localstorage
+    localStorage.setItem('notes', JSON.stringify(notes));
+}
 
 const addNewNote = (text = '') => {
     const note = document.createElement('div');
@@ -11,8 +21,8 @@ const addNewNote = (text = '') => {
         </div>
 
 
-        <div class="main"></div>
-        <textarea class="a"></textarea>
+        <div class="main ${text ? "" : "hidden"}"></div>
+        <textarea class="${text ? "hidden" : ""}"></textarea>
 `;
 
     note.insertAdjacentHTML('afterbegin', htmlData)
@@ -27,11 +37,39 @@ const addNewNote = (text = '') => {
 
 
     // deleteing note
-    deleteButton.addEventListener('click', () => note.remove
-        ());
+    deleteButton.addEventListener('click', () => {
+        note.remove();
+        updateLocalStograge();
+    });
+
+    // toggle note
+    textarea.value = text;
+    mainDiv.innerHTML = text;
+
+
+    editButton.addEventListener('click', () => {
+        mainDiv.classList.toggle('hidden');
+        textarea.classList.toggle('hidden');
+    });
+
+    textarea.addEventListener('change', (event) => {
+        const value = event.target.value;
+        // console.log(value);
+        mainDiv.innerHTML = value;
+        updateLocalStograge();
+
+    })
 
     document.body.appendChild(note);
 
 }
+
+
+// getting data back from localstorage
+const notes = JSON.parse(localStorage.getItem('notes'));
+if (notes) {
+    notes.forEach((note) => addNewNote(note))
+}
+
 
 addBtn.addEventListener('click', () => addNewNote());
